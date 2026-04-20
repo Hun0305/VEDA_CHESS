@@ -29,8 +29,9 @@ GameView::GameView() {
     gameStarted = false;
 }
 
-
 void GameView::displayMainMenu() {
+    scene->clear();
+
     // create title label
     double titleYPosition = 150;
     drawTitle(titleYPosition, 50);
@@ -41,7 +42,7 @@ void GameView::displayMainMenu() {
     double buttonYPosition = 275;
     startButton->setPos(buttonXPosition, buttonYPosition);
 
-    connect(startButton, SIGNAL(buttonPressed()), this, SLOT(startGame()));
+    connect(startButton, SIGNAL(buttonPressed()), this, SLOT(displayRoomList()));
     scene->addItem(startButton);
 
     // create quit button
@@ -52,6 +53,84 @@ void GameView::displayMainMenu() {
 
     connect(quitButton, SIGNAL(buttonPressed()), this, SLOT(quitGame()));
     scene->addItem(quitButton);
+}
+
+void GameView::displayRoomList() {
+    scene->clear(); // 현재 화면 지우기
+
+    // 1. 제목 그리기
+    drawTitle(50, 40);
+
+    // 2. 테이블 헤더 설정 (간격 조절)
+    int startY = 150;
+    int col1 = 200, col3 = 700, col4 = 900; // X 좌표 간격
+
+    QGraphicsTextItem *h1 = Utils::createTextItem("Game Name", 20, Qt::white);
+    h1->setPos(col1, startY);
+    scene->addItem(h1);
+
+    QGraphicsTextItem *h2 = Utils::createTextItem("Players", 20, Qt::white);
+    h2->setPos(col3, startY);
+    scene->addItem(h2);
+
+    QGraphicsTextItem *h3 = Utils::createTextItem("Action", 20, Qt::white);
+    h3->setPos(col4, startY);
+    scene->addItem(h3);
+
+    // 3. 더미 방 목록 데이터 루프 (예시 3개)
+    struct Room { QString name; QString players; };
+    QList<Room> rooms = { {"Software Chess", "1/2"}, {"PVP Challenge", "1/2"}, {"Wait for King", "0/2"} };
+
+    for(int i = 0; i < rooms.size(); ++i) {
+        int rowY = startY + 60 + (i * 70); // 행 간격
+
+        // 방 이름
+        QGraphicsTextItem *rName = Utils::createTextItem(rooms[i].name, 18, Qt::lightGray);
+        rName->setPos(col1, rowY + 10);
+        scene->addItem(rName);
+
+        // 인원 수
+        QGraphicsTextItem *rPlayers = Utils::createTextItem(rooms[i].players, 18, Qt::lightGray);
+        rPlayers->setPos(col3, rowY + 10);
+        scene->addItem(rPlayers);
+
+        // Join 버튼 (기존 ActionButton 재활용)
+        ActionButton *joinBtn = new ActionButton("Join");
+        joinBtn->setPos(col4, rowY);
+        joinBtn->setScale(0.7); // 리스트용으로 조금 작게 조절
+        connect(joinBtn, &ActionButton::buttonPressed, this, [this](){
+            networkManager = new NetworkManager(this);
+            networkManager->connectToHost("127.0.0.1", 12345); // 로컬 주소 접속
+
+            connect(networkManager, &NetworkManager::connected, this, &GameView::startGame);
+        });
+        scene->addItem(joinBtn);
+    }
+
+    // 4. 뒤로가기 버튼
+    ActionButton *hostButton = new ActionButton("Host Game");
+    // 위치를 "Back to Menu" 버튼 옆으로 잡습니다.
+    hostButton->setPos(this->width()/2 - hostButton->boundingRect().width() - 20, 650);
+    connect(hostButton, SIGNAL(buttonPressed()), this, SLOT(hostGame()));
+    scene->addItem(hostButton);
+
+    // --- 기존: Back to Menu 버튼 (위치 살짝 조정) ---
+    ActionButton *backButton = new ActionButton("Back to Menu");
+    backButton->setPos(this->width()/2 + 20, 650);
+    connect(backButton, SIGNAL(buttonPressed()), this, SLOT(displayMainMenu()));
+    scene->addItem(backButton);
+}
+
+// 방 만들기 버튼 클릭 시 실행될 함수
+void GameView::hostGame() {
+    networkManager = new NetworkManager(this);
+    if (networkManager->startHosting()) {
+        qDebug() << "Server started! Waiting for player...";
+        // 연결될 때까지 대기 메시지 표시 (UI 작업)
+        connect(networkManager, &NetworkManager::connected, this, [this](){
+            startGame(); // 상대방 접속 시 게임 시작
+        });
+    }
 }
 
 void GameView::startGame() {

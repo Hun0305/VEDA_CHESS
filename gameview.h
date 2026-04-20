@@ -9,28 +9,35 @@
 #include "boardviewmodel.h"
 #include "pawnfield.h"
 #include "playerview.h"
+#include "networkmanager.h"
 
 class GameView : public QGraphicsView {
     Q_OBJECT
 
 public:
     GameView();
-
     QGraphicsScene *scene;
 
-    void displayMainMenu();
-
 public slots:
+    void displayRoomList();
+    void displayMainMenu();
+    void hostGame();
     void startGame();
     void quitGame();
     void resetGame();
+    void onDataReceived(QString data); // 네트워크 데이터 처리 슬롯
 
 private:
+    NetworkManager *networkManager;
+
     BoardViewModel boardViewModel;
     bool gameStarted;
     BoardView *board;
     PlayerView *blackPlayerView;
     PlayerView *whitePlayerView;
+
+    PlayerType myColor; // 내 색상 저장 (호스트=White, 조인=Black)
+    void executeMove(BoardPosition from, BoardPosition to); // 실제 이동 로직 분리
 
     void drawBoard();
     void drawSettingsPanel();

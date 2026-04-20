@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT += core gui
+QT += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -38,6 +39,7 @@ SOURCES += \
         kingpawnmodel.cpp \
         knightpawnmodel.cpp \
         main.cpp \
+        networkmanager.cpp \
         pawnfield.cpp \
         pawnpawnmodel.cpp \
         pawnviemodel.cpp \
@@ -61,6 +63,7 @@ HEADERS += \
         helpers.h \
         kingpawnmodel.h \
         knightpawnmodel.h \
+        networkmanager.h \
         pawnfield.h \
         pawnpawnmodel.h \
         pawnviewmodel.h \
