@@ -1,5 +1,7 @@
 # Chess game 
 
+Hello World!
+
 Chess game written in C++ using QT Creator with Qt5 target
 
 ![](/Images/mainViewScreenshot.png)
