@@ -34,8 +34,10 @@ SOURCES += \
         boardframefield.cpp \
         boardview.cpp \
         boardviewmodel.cpp \
+        changepassworddialog.cpp \
         congratulationsview.cpp \
         constants.cpp \
+        deleteaccountdialog.cpp \
         gameview.cpp \
         kingpawnmodel.cpp \
         knightpawnmodel.cpp \
@@ -50,6 +52,7 @@ SOURCES += \
         rookpawnmodel.cpp \
         utils.cpp
 
+
 HEADERS += \
         actionbutton.h \
         basepawnmodel.h \
@@ -59,8 +62,10 @@ HEADERS += \
         boardposition.h \
         boardview.h \
         boardviewmodel.h \
+        changepassworddialog.h \
         congratulationsview.h \
         constants.h \
+        deleteaccountdialog.h \
         gameview.h \
         helpers.h \
         kingpawnmodel.h \
@@ -74,6 +79,7 @@ HEADERS += \
         queenpawnmodel.h \
         rookpawnmodel.h \
         utils.h
+
 
 FORMS += \
     loginwindow.ui

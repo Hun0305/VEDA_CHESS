@@ -80,4 +80,17 @@ void LoginWindow::on_registerButton_clicked() {
     }
 }
 
+void LoginWindow::on_btn_changePw_clicked() {
+    ChangePasswordDialog dialog(this);
+    // 모달 방식으로 창을 띄웁니다.
+    if (dialog.exec() == QDialog::Accepted) {
+        // 필요 시 변경 성공 후의 로직 추가
+    }
+}
+
+void LoginWindow::on_btn_deleteAccount_clicked() {
+    DeleteAccountDialog dialog(this);
+    dialog.exec();
+}
+
 QString LoginWindow::getLoggedInId() const { return loggedInId; }

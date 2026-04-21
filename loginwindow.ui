@@ -12,7 +12,6 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex"><number>0</number></property>
-     <!-- 로그인 페이지 (Index 0) -->
      <widget class="QWidget" name="loginPage">
       <layout class="QVBoxLayout" name="vbox1">
        <property name="spacing"><number>15</number></property>
@@ -22,11 +21,13 @@
        <item><widget class="QLineEdit" name="pwLineEdit"><property name="echoMode"><enum>QLineEdit::Password</enum></property><property name="placeholderText"><string>Password</string></property></widget></item>
        <item><widget class="QPushButton" name="loginButton"><property name="text"><string>Login</string></property></widget></item>
        <item><widget class="QPushButton" name="toRegisterButton"><property name="text"><string>계정이 없으신가요? 회원가입</string></property><property name="flat"><bool>true</bool></property></widget></item>
+       <item><widget class="QPushButton" name="btn_changePw"><property name="text"><string>비밀번호 변경</string></property><property name="flat"><bool>true</bool></property></widget></item>
+       
+       <item><widget class="QPushButton" name="btn_deleteAccount"><property name="text"><string>회원 탈퇴</string></property><property name="flat"><bool>true</bool></property></widget></item>
        <item><widget class="QLabel" name="statusLabel"><property name="text"><string/></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
        <item><spacer name="s2"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
       </layout>
      </widget>
-     <!-- 회원가입 페이지 (Index 1) -->
      <widget class="QWidget" name="registerPage">
       <layout class="QVBoxLayout" name="vbox2">
        <property name="spacing"><number>15</number></property>

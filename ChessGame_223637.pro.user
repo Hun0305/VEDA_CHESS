@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 19.0.0, 2026-04-20T17:10:34. -->
+<!-- Written by QtCreator 19.0.0, 2026-04-21T14:16:24. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
-  <value type="QByteArray">{5e6b915e-b11f-4d00-bd8c-71a38191c01f}</value>
+  <value type="QByteArray">{52ddf87e-1483-4059-a0c9-93cdf9517764}</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -86,12 +86,6 @@
     <valuelist type="QVariantList" key="ClangTools.SuppressedDiagnostics"/>
     <value type="bool" key="ClangTools.UseGlobalSettings">true</value>
    </valuemap>
-   <valuemap type="QVariantMap" key="CppEditor.QuickFix">
-    <value type="bool" key="UseGlobalSettings">true</value>
-   </valuemap>
-   <valuemap type="QVariantMap" key="PESettingsAspect">
-    <value type="bool" key="PESettingsAspect.UseGlobalSettings">true</value>
-   </valuemap>
    <value type="int" key="RcSync">0</value>
   </valuemap>
  </data>
@@ -172,7 +166,7 @@
      <value type="QString" key="PerfRecordArgsId">-e cpu-cycles --call-graph &quot;dwarf,4096&quot; -F 250</value>
      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:</value>
-     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/projects/practice1/QTPractice_Chess/ChessGame_223637.pro</value>
+     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/chess_workspace/QTPractice_Chess/ChessGame_223637.pro</value>
      <value type="bool" key="ProjectExplorer.RunConfiguration.Customized">false</value>
      <value type="QString" key="ProjectExplorer.RunConfiguration.UniqueId"></value>
      <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
@@ -210,7 +204,7 @@
     <value type="QString" key="PerfRecordArgsId">-e cpu-cycles --call-graph &quot;dwarf,4096&quot; -F 250</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/projects/practice1/QTPractice_Chess/ChessGame_223637.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/chess_workspace/QTPractice_Chess/ChessGame_223637.pro</value>
     <value type="bool" key="ProjectExplorer.RunConfiguration.Customized">false</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.UniqueId"></value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>

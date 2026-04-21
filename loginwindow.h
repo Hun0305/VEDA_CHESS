@@ -4,6 +4,8 @@
 #include <QDialog>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include "changepassworddialog.h"
+#include "deleteaccountdialog.h"
 
 namespace Ui { class LoginWindow; }
 
@@ -20,6 +22,8 @@ private slots:
     void on_toRegisterButton_clicked(); // 페이지 전환 (로그인 -> 회원가입)
     void on_backButton_clicked();       // 페이지 전환 (회원가입 -> 로그인)
     void on_registerButton_clicked();   // 회원가입 실행
+    void on_btn_changePw_clicked();
+    void on_btn_deleteAccount_clicked();
 
 private:
     Ui::LoginWindow *ui;
