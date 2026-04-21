@@ -168,11 +168,12 @@ void GameView::mouseMoveEvent(QMouseEvent *event) {
 
 
 void GameView::selectPawn(PawnField *pawn) {
-    if (pawn == nullptr) {
-        return;
-    }
-
     boardViewModel.setActivePawnForField(pawn);
+
+    // ===== 추가: 말이 선택되었으므로 갈 수 있는 범위 표시 =====
+    if(boardViewModel.getActivePawn() != nullptr) {
+        board->showValidMoves(boardViewModel.getActivePawn(), &boardViewModel);
+    }
 }
 
 void GameView::handleSelectingPointForActivePawnByMouse(QPoint point) {
@@ -262,8 +263,10 @@ void GameView::releaseActivePawn() {
     }
 
     BasePawnModel *activePawn = boardViewModel.getActivePawn();
+    board->clearHighlights();
     board->placeActivePawnAtBoardPosition(activePawn, activePawn->position);
     board->setPawnMoveCheckWarning(false);
+    boardViewModel.discardActivePawn();
     boardViewModel.discardActivePawn();
 }
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LoginWindow</class>
+ <widget class="QDialog" name="LoginWindow">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>400</width><height>500</height></rect>
+  </property>
+  <property name="windowTitle">
+   <string>Chess Game - Login</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="currentIndex"><number>0</number></property>
+     <!-- 로그인 페이지 (Index 0) -->
+     <widget class="QWidget" name="loginPage">
+      <layout class="QVBoxLayout" name="vbox1">
+       <property name="spacing"><number>15</number></property>
+       <item><spacer name="s1"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+       <item><widget class="QLabel" name="title1"><property name="text"><string>CHESS LOGIN</string></property><property name="alignment"><set>Qt::AlignCenter</set></property><property name="styleSheet"><string>font-size: 24px; font-weight: bold;</string></property></widget></item>
+       <item><widget class="QLineEdit" name="idLineEdit"><property name="placeholderText"><string>Username</string></property></widget></item>
+       <item><widget class="QLineEdit" name="pwLineEdit"><property name="echoMode"><enum>QLineEdit::Password</enum></property><property name="placeholderText"><string>Password</string></property></widget></item>
+       <item><widget class="QPushButton" name="loginButton"><property name="text"><string>Login</string></property></widget></item>
+       <item><widget class="QPushButton" name="toRegisterButton"><property name="text"><string>계정이 없으신가요? 회원가입</string></property><property name="flat"><bool>true</bool></property></widget></item>
+       <item><widget class="QLabel" name="statusLabel"><property name="text"><string/></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
+       <item><spacer name="s2"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+      </layout>
+     </widget>
+     <!-- 회원가입 페이지 (Index 1) -->
+     <widget class="QWidget" name="registerPage">
+      <layout class="QVBoxLayout" name="vbox2">
+       <property name="spacing"><number>15</number></property>
+       <item><spacer name="s3"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+       <item><widget class="QLabel" name="title2"><property name="text"><string>CREATE ACCOUNT</string></property><property name="alignment"><set>Qt::AlignCenter</set></property><property name="styleSheet"><string>font-size: 24px; font-weight: bold;</string></property></widget></item>
+       <item><widget class="QLineEdit" name="regIdLineEdit"><property name="placeholderText"><string>New Username</string></property></widget></item>
+       <item><widget class="QLineEdit" name="regPwLineEdit"><property name="echoMode"><enum>QLineEdit::Password</enum></property><property name="placeholderText"><string>New Password</string></property></widget></item>
+       <item><widget class="QPushButton" name="registerButton"><property name="text"><string>가입하기</string></property></widget></item>
+       <item><widget class="QPushButton" name="backButton"><property name="text"><string>로그인 화면으로 돌아가기</string></property><property name="flat"><bool>true</bool></property></widget></item>
+       <item><widget class="QLabel" name="regStatusLabel"><property name="text"><string/></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
+       <item><spacer name="s4"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>

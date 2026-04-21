@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -37,6 +37,7 @@ SOURCES += \
         gameview.cpp \
         kingpawnmodel.cpp \
         knightpawnmodel.cpp \
+        loginwindow.cpp \
         main.cpp \
         pawnfield.cpp \
         pawnpawnmodel.cpp \
@@ -61,6 +62,7 @@ HEADERS += \
         helpers.h \
         kingpawnmodel.h \
         knightpawnmodel.h \
+        loginwindow.h \
         pawnfield.h \
         pawnpawnmodel.h \
         pawnviewmodel.h \
@@ -69,7 +71,8 @@ HEADERS += \
         rookpawnmodel.h \
         utils.h
 
-FORMS +=
+FORMS += \
+    loginwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

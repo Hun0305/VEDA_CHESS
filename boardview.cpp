@@ -7,6 +7,7 @@
 #include "gameview.h"
 #include "pawnfield.h"
 #include "utils.h"
+#include "boardview.h"
 
 extern GameView *game;
 
@@ -99,9 +100,9 @@ PawnField* BoardView::getPawnAtMousePosition(QPoint point) {
         QPointF pawnPos = pawn->pos();
 
         if ((point.x() < (pawnPos.x() + pawn->rect().width())) &&
-                (point.x() > pawnPos.x()) &&
-                (point.y() < (pawnPos.y() + pawn->rect().height())) &&
-                (point.y() > pawnPos.y())) {
+            (point.x() > pawnPos.x()) &&
+            (point.y() < (pawnPos.y() + pawn->rect().height())) &&
+            (point.y() > pawnPos.y())) {
             return pawn;
         }
     }
@@ -219,4 +220,26 @@ QPointF BoardView::getCoordinatesForBoardPosition(BoardPosition position) {
     int yPosition = startYPosition + position.y*BoardField::defaultWidthHeight;
 
     return QPointF(xPosition, yPosition);
+}
+
+void BoardView::showValidMoves(BasePawnModel* pawn, BoardViewModel* viewModel) {
+    if (!pawn || !viewModel) return;
+
+    // 체스판의 모든 64개 칸을 하나씩 확인합니다
+    for (int i = 0; i < fields.length(); i++) {
+        BoardField *field = fields[i];
+        BoardPosition targetPos = field->getPosition();
+
+        // 해당 칸으로 현재 선택한 체스말이 이동 가능한지 검증 (기존 로직 100% 활용)
+        if (viewModel->validatePawnMove(targetPos, pawn)) {
+            field->setHighlight(true); // 이동 가능하면 불을 켭니다
+        }
+    }
+}
+
+void BoardView::clearHighlights() {
+    // 선택을 풀거나 턴이 끝났을 때 체스판 전체 칸의 불을 끕니다
+    for (int i = 0; i < fields.length(); i++) {
+        fields[i]->setHighlight(false);
+    }
 }

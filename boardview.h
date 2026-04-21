@@ -7,6 +7,7 @@
 #include "boardfield.h"
 #include "pawnfield.h"
 
+class BoardViewModel;
 class BoardView: public QGraphicsRectItem {
 
 public:
@@ -26,6 +27,8 @@ public:
     void removePawnAtBoardPosition(BoardPosition boardPosition);
     void setPawnMoveCheckWarning(bool visible);
     void promotePawnAtBoardPosition(BoardPosition boardPosition);
+    void showValidMoves(BasePawnModel* pawn, BoardViewModel* viewModel);
+    void clearHighlights();
 
 private:
     QList<BoardField*> fields;
