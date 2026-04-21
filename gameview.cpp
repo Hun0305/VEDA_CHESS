@@ -7,6 +7,7 @@
 #include "constants.h"
 #include "utils.h"
 #include <QInputDialog> // 상단에 추가
+#include "rankingdialog.h"
 
 int viewWidth = 1200;
 int viewHeight= 768;
@@ -60,6 +61,16 @@ void GameView::displayMainMenu() {
 
 void GameView::displayRoomList() {
     scene->clear(); // 현재 화면 지우기
+
+    // --- [추가] 오른쪽 상단 로그인 정보 표시 ---
+    if (!loggedInUserId.isEmpty()) {
+        QGraphicsTextItem *userInfo = Utils::createTextItem("닉네임: " + loggedInUserId, 15, Qt::yellow);
+        // 오른쪽 구석 좌표 계산 (여백 20)
+        double infoX = this->width() - userInfo->boundingRect().width() - 20;
+        double infoY = 20;
+        userInfo->setPos(infoX, infoY);
+        scene->addItem(userInfo);
+    }
 
     // 1. 제목 그리기
     QGraphicsTextItem *title = Utils::createTextItem("Lobby", 40, Qt::white);
@@ -132,6 +143,19 @@ void GameView::displayRoomList() {
         connect(globalHostBtn, SIGNAL(buttonPressed()), this, SLOT(globalHostGame()));
         scene->addItem(globalHostBtn);
     }
+
+    ActionButton *rankingBtn = new ActionButton("Ranking");
+
+    // 위치 설정: "Back to Menu" 버튼의 왼쪽 혹은 적절한 빈 공간
+    // 여기서는 화면 하단 중앙 근처로 배치하겠습니다.
+    rankingBtn->setPos(this->width()/2 - rankingBtn->boundingRect().width() / 2, 480);
+
+    // 버튼 클릭 시 RankingDialog 실행 연결 (람다식 활용)
+    connect(rankingBtn, &ActionButton::buttonPressed, this, [this]() {
+        RankingDialog dialog(this);
+        dialog.exec();
+    });
+    scene->addItem(rankingBtn);
 
     // 4. 뒤로가기 버튼
     ActionButton *hostButton = new ActionButton("Host Game");

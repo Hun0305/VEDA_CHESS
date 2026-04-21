@@ -32,6 +32,7 @@ public slots:
     void addLog(QString message); // 로그 메시지 추가 함수
     void globalHostGame();
     void globalJoinGame();
+    void setLoggedInUser(QString id) { loggedInUserId = id; } // 아이디 설정 함수
 
 private:
     NetworkManager *networkManager;
@@ -44,6 +45,7 @@ private:
     BoardView *board;
     PlayerView *blackPlayerView;
     PlayerView *whitePlayerView;
+    QString loggedInUserId; // 로그인한 유저의 ID를 저장
 
     PlayerType myColor; // 내 색상 저장 (호스트=White, 조인=Black)
     void executeMove(BoardPosition from, BoardPosition to); // 실제 이동 로직 분리

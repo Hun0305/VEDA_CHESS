@@ -49,6 +49,7 @@ SOURCES += \
         pawnviemodel.cpp \
         playerview.cpp \
         queenpawnmodel.cpp \
+        rankingdialog.cpp \
         rookpawnmodel.cpp \
         utils.cpp
 
@@ -77,6 +78,7 @@ HEADERS += \
         pawnviewmodel.h \
         playerview.h \
         queenpawnmodel.h \
+        rankingdialog.h \
         rookpawnmodel.h \
         utils.h
 
