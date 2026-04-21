@@ -30,6 +30,8 @@ public slots:
     void resignGame(); // 기존 resetGame() 대신 사용할 함수
     void onDataReceived(QString data); // 네트워크 데이터 처리 슬롯
     void addLog(QString message); // 로그 메시지 추가 함수
+    void globalHostGame();
+    void globalJoinGame();
 
 private:
     NetworkManager *networkManager;

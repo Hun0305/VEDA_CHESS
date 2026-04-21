@@ -6,6 +6,7 @@
 #include "congratulationsview.h"
 #include "constants.h"
 #include "utils.h"
+#include <QInputDialog> // 상단에 추가
 
 int viewWidth = 1200;
 int viewHeight= 768;
@@ -120,6 +121,16 @@ void GameView::displayRoomList() {
             networkManager->connectToHost("127.0.0.1", 12345);
         });
         scene->addItem(joinBtn);
+
+        ActionButton *globalJoinBtn = new ActionButton("Global Join");
+        globalJoinBtn->setPos(this->width()/2 + 20, 550);
+        connect(globalJoinBtn, SIGNAL(buttonPressed()), this, SLOT(globalJoinGame()));
+        scene->addItem(globalJoinBtn);
+
+        ActionButton *globalHostBtn = new ActionButton("Global Host");
+        globalHostBtn->setPos(globalJoinBtn->boundingRect().width() + 180, 550);
+        connect(globalHostBtn, SIGNAL(buttonPressed()), this, SLOT(globalHostGame()));
+        scene->addItem(globalHostBtn);
     }
 
     // 4. 뒤로가기 버튼
@@ -486,4 +497,41 @@ void GameView::showCongratulationsScreen(PlayerType winner) {
 
     CongratulationsView *congratulationsView = new CongratulationsView(winner);
     congratulationsView->setRect(0, 0, viewWidth, viewHeight);
+}
+
+void GameView::globalHostGame() {
+    myColor = PlayerType::white;
+    networkManager = new NetworkManager(this);
+
+    if (networkManager->startHosting(12345)) {
+        qDebug() << "Global Server started! Waiting on Port 12345...";
+
+        // TODO: UI에 "접속 대기 중... 내 공인 IP를 친구에게 알려주세요" 메시지 표시
+
+        connect(networkManager, &NetworkManager::connected, this, [this](){
+            startGame();
+        });
+        connect(networkManager, &NetworkManager::dataReceived, this, &GameView::onDataReceived);
+    }
+}
+
+void GameView::globalJoinGame() {
+    // 1. 사용자에게 IP 주소를 입력받는 팝업 창 띄우기
+    bool ok;
+    QString ipAddress = QInputDialog::getText(nullptr, "Join Global Game",
+                                              "Enter Host's IP Address:",
+                                              QLineEdit::Normal,
+                                              "127.0.0.1", &ok);
+
+    // 2. 사용자가 확인(OK)을 눌렀고 IP를 입력했다면 접속 시도
+    if (ok && !ipAddress.isEmpty()) {
+        myColor = PlayerType::black;
+        networkManager = new NetworkManager(this);
+
+        // 입력받은 IP로 접속 시도
+        networkManager->connectToHost(ipAddress, 12345);
+
+        connect(networkManager, &NetworkManager::dataReceived, this, &GameView::onDataReceived);
+        connect(networkManager, &NetworkManager::connected, this, &GameView::startGame);
+    }
 }
