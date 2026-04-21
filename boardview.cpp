@@ -223,23 +223,34 @@ QPointF BoardView::getCoordinatesForBoardPosition(BoardPosition position) {
 }
 
 void BoardView::showValidMoves(BasePawnModel* pawn, BoardViewModel* viewModel) {
-    if (!pawn || !viewModel) return;
+    // [방어 1] 말이나 뷰모델이 존재하지 않으면 즉시 중지
+    if (pawn == nullptr || viewModel == nullptr) return;
 
-    // 체스판의 모든 64개 칸을 하나씩 확인합니다
+    // [방어 2] 보드판 칸 리스트가 비어있으면 중지
+    if (fields.isEmpty()) return;
+
     for (int i = 0; i < fields.length(); i++) {
         BoardField *field = fields[i];
+
+        // [방어 3] 칸 자체가 메모리에서 날아갔거나 null이면 건너뜀
+        if (field == nullptr) continue;
+
         BoardPosition targetPos = field->getPosition();
 
-        // 해당 칸으로 현재 선택한 체스말이 이동 가능한지 검증 (기존 로직 100% 활용)
+        // 기존 100% 로직
         if (viewModel->validatePawnMove(targetPos, pawn)) {
-            field->setHighlight(true); // 이동 가능하면 불을 켭니다
+            field->setHighlight(true);
         }
     }
 }
 
 void BoardView::clearHighlights() {
-    // 선택을 풀거나 턴이 끝났을 때 체스판 전체 칸의 불을 끕니다
+    if (fields.isEmpty()) return;
+
     for (int i = 0; i < fields.length(); i++) {
-        fields[i]->setHighlight(false);
+        // [방어 4] null이 아닐 때만 색을 원래대로 복구
+        if (fields[i] != nullptr) {
+            fields[i]->setHighlight(false);
+        }
     }
 }

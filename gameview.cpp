@@ -168,6 +168,16 @@ void GameView::mouseMoveEvent(QMouseEvent *event) {
 
 
 void GameView::selectPawn(PawnField *pawn) {
+
+    // ==========================================================
+    // ===== [핵심 방어막] 허공(빈 칸)을 클릭해서 체스말이 없다면 즉시 종료! =====
+    if (pawn == nullptr) {
+        board->clearHighlights(); // 허공을 누르면 켜져있던 불도 끕니다
+        boardViewModel.discardActivePawn(); // 선택된 말도 취소합니다
+        return;
+    }
+    // ==========================================================
+
     boardViewModel.setActivePawnForField(pawn);
 
     // ===== 추가: 말이 선택되었으므로 갈 수 있는 범위 표시 =====
@@ -207,6 +217,11 @@ void GameView::handleSelectingPointForActivePawnByMouse(QPoint point) {
 
     // move active pawn to new position
     moveActivePawnToSelectedPoint(point);
+
+    if (board != nullptr)
+    {
+    board->clearHighlights();
+    }
 
     // check if pawn can be promoted
     if (boardViewModel.didPromoteActivePawn()) {
