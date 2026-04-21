@@ -13,6 +13,8 @@
 #include <QTextEdit>
 #include <QGraphicsProxyWidget>
 #include <QTime>
+#include <QLineEdit>
+#include <QComboBox>
 
 class GameView : public QGraphicsView {
     Q_OBJECT
@@ -32,12 +34,22 @@ public slots:
     void addLog(QString message); // 로그 메시지 추가 함수
     void globalHostGame();
     void globalJoinGame();
+    void showHostGameSettings(); // 방 생성 설정 화면 띄우기
+    void confirmHostGame();      // 설정 완료 후 호스팅 시작
+    void onGameDiscovered(QString ip, int port, QString roomName);
 
 private:
     NetworkManager *networkManager;
 
+    int nextRoomY;               // 다음 방이 그려질 Y 좌표
+    QSet<QString> discoveredRooms; // 중복 방 표시 방지 (IP:Port 저장)
+
     QTextEdit *logWindow; // 로그를 출력할 위젯
     QString getChessNotation(BoardPosition pos); // 좌표를 A1, D4 형식으로 변환
+
+    QLineEdit *roomNameInput;
+    QComboBox *networkModeInput;
+    QLineEdit *portInput;
 
     BoardViewModel boardViewModel;
     bool gameStarted;

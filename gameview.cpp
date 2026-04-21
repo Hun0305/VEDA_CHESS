@@ -7,6 +7,8 @@
 #include "constants.h"
 #include "utils.h"
 #include <QInputDialog> // 상단에 추가
+#include <QLabel>
+#include <QGraphicsProxyWidget>
 
 int viewWidth = 1200;
 int viewHeight= 768;
@@ -60,6 +62,23 @@ void GameView::displayMainMenu() {
 
 void GameView::displayRoomList() {
     scene->clear(); // 현재 화면 지우기
+    discoveredRooms.clear(); // 검색된 방 목록 초기화
+    nextRoomY = 220;         // 헤더(150) 아래에 첫 번째 방이 나타날 위치
+
+    // 2. 하단 컨트롤 버튼
+    // [새로고침] - 다시 이 함수를 호출하여 화면을 깨끗하게 하고 재검색
+    ActionButton *refreshBtn = new ActionButton("Refresh");
+    refreshBtn->setPos(this->width()/2 + 250, 650);
+    connect(refreshBtn, &ActionButton::buttonPressed, this, &GameView::displayRoomList);
+    scene->addItem(refreshBtn);
+
+    // 로비용 NetworkManager 생성 및 듣기 시작
+    if (!networkManager) networkManager = new NetworkManager(this);
+
+    disconnect(networkManager, &NetworkManager::gameDiscovered, this, &GameView::onGameDiscovered);
+    connect(networkManager, &NetworkManager::gameDiscovered, this, &GameView::onGameDiscovered);
+
+    networkManager->startListeningForGames();
 
     // 1. 제목 그리기
     QGraphicsTextItem *title = Utils::createTextItem("Lobby", 40, Qt::white);
@@ -70,7 +89,19 @@ void GameView::displayRoomList() {
     // 2. 테이블 헤더 설정 (간격 조절)
     int startY = 150;
     int col1 = 200, col3 = 700, col4 = 900; // X 좌표 간격
+    QGraphicsTextItem *roomnameText = Utils::createTextItem("Room name", 20, Qt::white);
+    roomnameText->setPos(col1, 150);
+    scene->addItem(roomnameText);
 
+    QGraphicsTextItem *ipaddressText = Utils::createTextItem("IP Address", 20, Qt::white);
+    ipaddressText->setPos(col3, 150);
+    scene->addItem(ipaddressText);
+
+    QGraphicsTextItem *actionText= Utils::createTextItem("Action", 20, Qt::white);
+    actionText->setPos(col4, 150);
+    scene->addItem(actionText);
+
+    /*
     QGraphicsTextItem *h1 = Utils::createTextItem("Game Name", 20, Qt::white);
     h1->setPos(col1, startY);
     scene->addItem(h1);
@@ -82,62 +113,75 @@ void GameView::displayRoomList() {
     QGraphicsTextItem *h3 = Utils::createTextItem("Action", 20, Qt::white);
     h3->setPos(col4, startY);
     scene->addItem(h3);
+    */
 
     // 3. 더미 방 목록 데이터 루프 (예시 3개)
     struct Room { QString name; QString players; };
     QList<Room> rooms = { {"Software Chess", "1/2"}, {"PVP Challenge", "1/2"}, {"Wait for King", "0/2"} };
 
-    for(int i = 0; i < rooms.size(); ++i) {
-        int rowY = startY + 60 + (i * 70); // 행 간격
+    // for(int i = 0; i < rooms.size(); ++i) {
+    //     int rowY = startY + 60 + (i * 70); // 행 간격
 
-        // 방 이름
-        QGraphicsTextItem *rName = Utils::createTextItem(rooms[i].name, 18, Qt::lightGray);
-        rName->setPos(col1, rowY + 10);
-        scene->addItem(rName);
+    //     // 방 이름
+    //     QGraphicsTextItem *rName = Utils::createTextItem(rooms[i].name, 18, Qt::lightGray);
+    //     rName->setPos(col1, rowY + 10);
+    //     scene->addItem(rName);
 
-        // 인원 수
-        QGraphicsTextItem *rPlayers = Utils::createTextItem(rooms[i].players, 18, Qt::lightGray);
-        rPlayers->setPos(col3, rowY + 10);
-        scene->addItem(rPlayers);
+    //     // 인원 수
+    //     QGraphicsTextItem *rPlayers = Utils::createTextItem(rooms[i].players, 18, Qt::lightGray);
+    //     rPlayers->setPos(col3, rowY + 10);
+    //     scene->addItem(rPlayers);
 
-        // Join 버튼 (기존 ActionButton 재활용)
-        ActionButton *joinBtn = new ActionButton("Join");
-        joinBtn->setPos(col4, rowY);
-        joinBtn->setScale(0.7); // 리스트용으로 조금 작게 조절
-        // 수정된 코드
-        connect(joinBtn, &ActionButton::buttonPressed, this, [this](){
-            myColor = PlayerType::black;
+    //     // Join 버튼 (기존 ActionButton 재활용)
+    //     ActionButton *joinBtn = new ActionButton("Join");
+    //     joinBtn->setPos(col4, rowY);
+    //     joinBtn->setScale(0.7); // 리스트용으로 조금 작게 조절
+    //     // 수정된 코드
+    //     connect(joinBtn, &ActionButton::buttonPressed, this, [this](){
+    //         myColor = PlayerType::black;
 
-            // 1. 인스턴스 생성 (누락되었던 부분)
-            if (!networkManager) {
-                networkManager = new NetworkManager(this);
-            }
+    //         // 1. 인스턴스 생성 (누락되었던 부분)
+    //         if (!networkManager) {
+    //             networkManager = new NetworkManager(this);
+    //         }
 
-            // 2. 시그널 연결을 먼저 수행하는 것이 안전합니다.
-            connect(networkManager, &NetworkManager::dataReceived, this, &GameView::onDataReceived);
-            connect(networkManager, &NetworkManager::connected, this, &GameView::startGame);
+    //         // 2. 시그널 연결을 먼저 수행하는 것이 안전합니다.
+    //         connect(networkManager, &NetworkManager::dataReceived, this, &GameView::onDataReceived);
+    //         connect(networkManager, &NetworkManager::connected, this, &GameView::startGame);
 
-            // 3. 서버 접속 시도
-            networkManager->connectToHost("127.0.0.1", 12345);
-        });
-        scene->addItem(joinBtn);
+    //         // 3. 서버 접속 시도
+    //         networkManager->connectToHost("127.0.0.1", 12345);
+    //     });
+    //     scene->addItem(joinBtn);
 
-        ActionButton *globalJoinBtn = new ActionButton("Global Join");
-        globalJoinBtn->setPos(this->width()/2 + 20, 550);
-        connect(globalJoinBtn, SIGNAL(buttonPressed()), this, SLOT(globalJoinGame()));
-        scene->addItem(globalJoinBtn);
+    //     /*
+    //     // global join
+    //     ActionButton *globalJoinBtn = new ActionButton("Global Join");
+    //     globalJoinBtn->setPos(this->width()/2 + 20, 550);
+    //     connect(globalJoinBtn, SIGNAL(buttonPressed()), this, SLOT(globalJoinGame()));
+    //     scene->addItem(globalJoinBtn);
 
-        ActionButton *globalHostBtn = new ActionButton("Global Host");
-        globalHostBtn->setPos(globalJoinBtn->boundingRect().width() + 180, 550);
-        connect(globalHostBtn, SIGNAL(buttonPressed()), this, SLOT(globalHostGame()));
-        scene->addItem(globalHostBtn);
-    }
+    //     ActionButton *globalHostBtn = new ActionButton("Global Host");
+    //     globalHostBtn->setPos(globalJoinBtn->boundingRect().width() + 180, 550);
+    //     connect(globalHostBtn, SIGNAL(buttonPressed()), this, SLOT(globalHostGame()));
+    //     scene->addItem(globalHostBtn);
+    //     */
+    // }
 
-    // 4. 뒤로가기 버튼
+    /*
+    // local multiplay join
     ActionButton *hostButton = new ActionButton("Host Game");
     // 위치를 "Back to Menu" 버튼 옆으로 잡습니다.
     hostButton->setPos(this->width()/2 - hostButton->boundingRect().width() - 20, 650);
     connect(hostButton, SIGNAL(buttonPressed()), this, SLOT(hostGame()));
+    scene->addItem(hostButton);
+    */
+
+    // [수정] 단일 Host Game 버튼 생성
+    ActionButton *hostButton = new ActionButton("Host Game");
+    hostButton->setPos(this->width()/2 - hostButton->boundingRect().width() - 20, 650);
+    // 클릭 시 설정 화면으로 이동
+    connect(hostButton, SIGNAL(buttonPressed()), this, SLOT(showHostGameSettings()));
     scene->addItem(hostButton);
 
     // --- 기존: Back to Menu 버튼 (위치 살짝 조정) ---
@@ -534,4 +578,161 @@ void GameView::globalJoinGame() {
         connect(networkManager, &NetworkManager::dataReceived, this, &GameView::onDataReceived);
         connect(networkManager, &NetworkManager::connected, this, &GameView::startGame);
     }
+}
+
+void GameView::showHostGameSettings() {
+    scene->clear();
+    drawTitle(100, 40);
+
+    int labelX = 400;
+    int inputX = 600;
+    int startY = 250;
+    int spacing = 60;
+
+    // 1. 방 이름 (Room Name)
+    QLabel *nameLabel = new QLabel("Room Name:");
+    nameLabel->setStyleSheet("color: white; font-size: 20px; background: transparent;");
+    QGraphicsProxyWidget *nameLabelProxy = scene->addWidget(nameLabel);
+    nameLabelProxy->setPos(labelX, startY);
+
+    roomNameInput = new QLineEdit("My Chess Room");
+    roomNameInput->setFixedSize(200, 30);
+    roomNameInput->setStyleSheet("background-color: white; color: black; font-size: 16px;");
+    QGraphicsProxyWidget *nameInputProxy = scene->addWidget(roomNameInput);
+    nameInputProxy->setPos(inputX, startY);
+
+    // 2. 네트워크 모드 (Network Mode)
+    QLabel *modeLabel = new QLabel("Network Mode:");
+    modeLabel->setStyleSheet("color: white; font-size: 20px; background: transparent;");
+    QGraphicsProxyWidget *modeLabelProxy = scene->addWidget(modeLabel);
+    modeLabelProxy->setPos(labelX, startY + spacing);
+
+    networkModeInput = new QComboBox();
+    networkModeInput->addItems({"Local (LAN)", "Global (Public IP)"});
+    networkModeInput->setFixedSize(200, 30);
+    networkModeInput->setStyleSheet("background-color: white; color: black; font-size: 16px;");
+    QGraphicsProxyWidget *modeInputProxy = scene->addWidget(networkModeInput);
+    modeInputProxy->setPos(inputX, startY + spacing);
+
+    modeInputProxy->setZValue(10);
+
+    // 3. 포트 번호 (Port)
+    QLabel *portLabel = new QLabel("Port:");
+    portLabel->setStyleSheet("color: white; font-size: 20px; background: transparent;");
+    QGraphicsProxyWidget *portLabelProxy = scene->addWidget(portLabel);
+    portLabelProxy->setPos(labelX, startY + spacing * 2);
+
+    portInput = new QLineEdit("12345");
+    portInput->setFixedSize(200, 30);
+    portInput->setStyleSheet("background-color: white; color: black; font-size: 16px;");
+    QGraphicsProxyWidget *portInputProxy = scene->addWidget(portInput);
+    portInputProxy->setPos(inputX, startY + spacing * 2);
+
+    // 4. 동작 버튼
+    ActionButton *startBtn = new ActionButton("Start Hosting");
+    startBtn->setPos(labelX, 500);
+    connect(startBtn, SIGNAL(buttonPressed()), this, SLOT(confirmHostGame()));
+    scene->addItem(startBtn);
+
+    ActionButton *cancelBtn = new ActionButton("Cancel");
+    cancelBtn->setPos(inputX, 500);
+    connect(cancelBtn, SIGNAL(buttonPressed()), this, SLOT(displayRoomList()));
+    scene->addItem(cancelBtn);
+}
+
+void GameView::confirmHostGame() {
+    QString roomName = roomNameInput->text();
+    QString mode = networkModeInput->currentText();
+    int port = portInput->text().toInt();
+
+    if (port <= 0 || port > 65535) port = 12345;
+
+    myColor = PlayerType::white;
+
+    // [핵심 1] 기존에 로비에서 사용하던 NetworkManager가 있다면, 듣기를 멈추고 시그널을 끊습니다.
+    if (networkManager) {
+        networkManager->stopListeningForGames();
+        disconnect(networkManager, &NetworkManager::gameDiscovered, this, &GameView::onGameDiscovered);
+    } else {
+        networkManager = new NetworkManager(this);
+    }
+
+    if (networkManager->startHosting(port)) {
+        qDebug() << "Hosting started! Room:" << roomName << "Mode:" << mode << "Port:" << port;
+
+        // UDP 브로드캐스트 시작
+        if (mode == "Local (LAN)") {
+            networkManager->startBroadcasting(roomName, port);
+        }
+
+        scene->clear();
+        drawTitle(150, 40);
+
+        QString waitMsg = QString("Waiting for opponent...\nRoom: %1\nPort: %2").arg(roomName).arg(port);
+        QGraphicsTextItem *waitText = Utils::createTextItem(waitMsg, 24, Qt::white);
+        waitText->setPos(this->width()/2 - waitText->boundingRect().width()/2, 350);
+        scene->addItem(waitText);
+
+        ActionButton *cancelBtn = new ActionButton("Cancel Hosting");
+        cancelBtn->setPos(this->width()/2 - cancelBtn->boundingRect().width()/2, 500);
+
+        // [핵심 2] Cancel 버튼 클릭 시 브로드캐스트를 멈추고 리소스를 정리합니다.
+        connect(cancelBtn, &ActionButton::buttonPressed, this, [this](){
+            if (networkManager) {
+                networkManager->stopBroadcasting(); // 외치기 중단
+
+                // TCP 서버 포트 점유를 풀고 새롭게 시작하기 위해 객체 자체를 파기합니다.
+                networkManager->deleteLater();
+                networkManager = nullptr;
+            }
+            displayRoomList(); // 다시 로비로 돌아감
+        });
+        scene->addItem(cancelBtn);
+
+        connect(networkManager, &NetworkManager::connected, this, [this](){
+            networkManager->stopBroadcasting(); // 상대방이 접속하면 외치기를 멈춥니다!
+            startGame();
+        });
+        connect(networkManager, &NetworkManager::dataReceived, this, &GameView::onDataReceived);
+    } else {
+        qDebug() << "Failed to start hosting on port" << port;
+    }
+}
+
+void GameView::onGameDiscovered(QString ip, int port, QString roomName) {
+    // 1. 중복 검사 (같은 방이 여러 번 리스트에 뜨는 것 방지)
+    QString roomKey = QString("%1:%2").arg(ip).arg(port);
+    if (discoveredRooms.contains(roomKey)) return;
+    discoveredRooms.insert(roomKey);
+
+    int col1 = 200, col2 = 500, col3 = 800;
+
+    // 2. 방 정보 텍스트 추가
+    QGraphicsTextItem *nameItem = Utils::createTextItem(roomName, 18, Qt::lightGray);
+    nameItem->setPos(col1, nextRoomY);
+    scene->addItem(nameItem);
+
+    QGraphicsTextItem *ipItem = Utils::createTextItem(ip, 18, Qt::lightGray);
+    ipItem->setPos(col2, nextRoomY);
+    scene->addItem(ipItem);
+
+    // 3. [Join] 버튼 추가
+    ActionButton *joinBtn = new ActionButton("Join");
+    joinBtn->setScale(0.6); // 리스트용 사이즈 조절
+    joinBtn->setPos(col3, nextRoomY - 5);
+
+    // 버튼 클릭 시 해당 IP/Port로 접속 시도
+    connect(joinBtn, &ActionButton::buttonPressed, this, [this, ip, port](){
+        myColor = PlayerType::black; // 조인하는 사람은 흑색
+        networkManager->stopListeningForGames(); // 게임 시작 전 리스닝 중단
+
+        networkManager->connectToHost(ip, port);
+        connect(networkManager, &NetworkManager::dataReceived, this, &GameView::onDataReceived);
+        connect(networkManager, &NetworkManager::connected, this, &GameView::startGame);
+    });
+
+    scene->addItem(joinBtn);
+
+    // 4. 다음 방을 위해 Y 좌표 증가
+    nextRoomY += 60;
 }
