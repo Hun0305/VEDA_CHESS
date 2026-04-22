@@ -17,7 +17,7 @@ public:
     void sendMove(QString moveData);         // 데이터 전송
 
     // --- 새로 추가할 UDP 브로드캐스트용 함수 ---
-    void startBroadcasting(QString roomName, int tcpPort);
+    void startBroadcasting(QString roomName, int port, QString hostName);
     void stopBroadcasting();
     void startListeningForGames();
     void stopListeningForGames();
@@ -27,7 +27,7 @@ signals:
     void dataReceived(QString data);         // 데이터 수신 시그널
 
     // --- 새로 추가할 시그널 (방을 찾았을 때 UI로 전달) ---
-    void gameDiscovered(QString ip, int port, QString roomName);
+    void gameDiscovered(QString ip, int port, QString roomName, QString hostName);
 
 private slots:
     void onNewConnection();                  // 호스트: 새 플레이어 접속 시
@@ -44,6 +44,7 @@ private:
     QUdpSocket *udpListenSocket = nullptr;
     QTimer *broadcastTimer = nullptr;
     QString currentRoomName;
+    QString currentHostName; // 닉네임 저장을 위한 변수 추가
     int currentTcpPort;
 };
 

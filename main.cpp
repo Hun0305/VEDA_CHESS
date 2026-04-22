@@ -5,23 +5,31 @@
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    // 🎨 [미래지향적 네온 사이버 테마]
+    // main.cpp의 styleSheet 부분을 아래 코드로 완전히 교체하세요.
     QString styleSheet =
-        "QWidget { background-color: #0A0F16; color: #00F0FF; font-family: 'Consolas', 'Segoe UI', sans-serif; font-size: 15px; }"
+        // 수정할 코드 (폰트 목록에 궁서, 바탕, 명조체 추가)
+        "QWidget { background-color: #2D1B14; color: #F5F5DC; font-family: 'Georgia', 'Batang', '궁서', 'Nanum Myeongjo', serif; font-size: 15px; }"
         "QPushButton { "
-        "   background-color: transparent; border: 2px solid #00F0FF; border-radius: 4px; "
-        "   font-weight: bold; padding: 10px 15px; color: #00F0FF; text-transform: uppercase; letter-spacing: 2px; "
+        "   background-color: #5D4037; border: 2px solid #D4AF37; border-radius: 2px; "
+        "   font-weight: bold; padding: 10px 15px; color: #D4AF37; "
         "}"
-        "QPushButton:hover { background-color: #00F0FF; color: #0A0F16; }"
+        "QPushButton:hover { background-color: #8D6E63; color: #FFFFFF; }"
+        "QPushButton:pressed { background-color: #3E2723; }"
         "QLineEdit, QComboBox { "
-        "   background-color: rgba(0, 240, 255, 0.05); border: 1px solid #1A2639; "
-        "   border-bottom: 2px solid #00F0FF; border-radius: 2px; "
-        "   padding: 8px; color: #FFFFFF; font-weight: bold; min-height: 30px; " // 높이 보강
+        "   background-color: #F5F5DC; border: 1px solid #A1887F; "
+        "   border-radius: 0px; padding: 8px; color: #3E2723; font-style: italic; "
+        "   min-height: 30px; "
         "}"
-        "QLineEdit:focus, QComboBox:focus { border: 1px solid #00F0FF; background-color: rgba(0, 240, 255, 0.1); }"
-        "QTableWidget { background-color: #0B121A; border: 1px solid #00F0FF; color: #FFFFFF; gridline-color: #00F0FF; }"
-        "QHeaderView::section { background-color: #004D55; color: #00F0FF; font-weight: bold; padding: 8px; border: 1px solid #00F0FF; }"
-        "QLabel { background: transparent; }";
+        "QLineEdit:focus { border: 2px solid #D4AF37; }"
+        "QTableWidget { "
+        "   background-color: #F5F5DC; color: #3E2723; "
+        "   gridline-color: #D4AF37; border: 2px solid #D4AF37; "
+        "}"
+        "QHeaderView::section { "
+        "   background-color: #D4AF37; color: #2D1B14; font-weight: bold; "
+        "   padding: 5px; border: 1px solid #2D1B14; "
+        "}"
+        "QLabel { background: transparent; color: #F5F5DC; }";
     a.setStyleSheet(styleSheet);
 
     LoginWindow login;
