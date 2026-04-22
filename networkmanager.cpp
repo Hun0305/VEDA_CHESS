@@ -1,6 +1,10 @@
 #include "networkmanager.h"
+#include <QTimer>
+#include <QNetworkDatagram>
 
-NetworkManager::NetworkManager(QObject *parent) : QObject(parent), tcpServer(nullptr), tcpSocket(nullptr) {}
+NetworkManager::NetworkManager(QObject *parent)
+    : QObject(parent), tcpServer(nullptr), tcpSocket(nullptr),
+    udpBroadcastSocket(nullptr), udpListenSocket(nullptr), broadcastTimer(nullptr) {}
 
 bool NetworkManager::startHosting(int port) {
     tcpServer = new QTcpServer(this);
@@ -18,44 +22,41 @@ void NetworkManager::connectToHost(QString ip, int port) {
 void NetworkManager::onNewConnection() {
     tcpSocket = tcpServer->nextPendingConnection();
     connect(tcpSocket, &QTcpSocket::readyRead, this, &NetworkManager::onReadyRead);
-    emit connected(); // 호스트도 연결된 것으로 간주
+    emit connected();
 }
 
 void NetworkManager::onReadyRead() {
     QByteArray data = tcpSocket->readAll();
-    emit dataReceived(QString(data));
+    emit dataReceived(QString::fromUtf8(data));
 }
 
 void NetworkManager::sendMove(QString moveData) {
     if (tcpSocket && tcpSocket->isOpen()) {
-        // 메시지 끝에 구분자 ';'를 추가하여 전송
         QString framedData = moveData + ";";
         tcpSocket->write(framedData.toUtf8());
         tcpSocket->flush();
-        qDebug() << "Sending Packet:" << framedData;
     }
 }
 
-// ==========================================
-// UDP 호스트: 내 방 정보를 1초마다 외침
-// ==========================================
-void NetworkManager::startBroadcasting(QString roomName, int tcpPort) {
+// =========================================================================
+// [수정] startBroadcasting: 닉네임(hostName)을 추가로 받아 저장합니다.
+// =========================================================================
+void NetworkManager::startBroadcasting(QString roomName, int tcpPort, QString hostName) {
     udpBroadcastSocket = new QUdpSocket(this);
     broadcastTimer = new QTimer(this);
     currentRoomName = roomName;
     currentTcpPort = tcpPort;
+    currentHostName = hostName; // 헤더에 추가한 변수에 저장
 
-    // 1초(1000ms)마다 sendBroadcast 함수 실행
     connect(broadcastTimer, &QTimer::timeout, this, &NetworkManager::sendBroadcast);
     broadcastTimer->start(1000);
 }
 
 void NetworkManager::sendBroadcast() {
-    // 패킷 형태: "CHESS_LAN|방이름|TCP포트"
-    QString msg = QString("CHESS_LAN|%1|%2").arg(currentRoomName).arg(currentTcpPort);
+    // 패킷 형태: "CHESS_LAN|방이름|TCP포트|닉네임" (4개로 확장)
+    QString msg = QString("CHESS_LAN|%1|%2|%3").arg(currentRoomName).arg(currentTcpPort).arg(currentHostName);
     QByteArray datagram = msg.toUtf8();
 
-    // 같은 네트워크 상의 모든 PC의 45454 포트로 메시지를 던짐
     udpBroadcastSocket->writeDatagram(datagram, QHostAddress::Broadcast, 45454);
 }
 
@@ -64,13 +65,9 @@ void NetworkManager::stopBroadcasting() {
     if (udpBroadcastSocket) { udpBroadcastSocket->deleteLater(); udpBroadcastSocket = nullptr; }
 }
 
-// ==========================================
-// UDP 클라이언트 (Lobby): 다른 방의 외침을 들음
-// ==========================================
 void NetworkManager::startListeningForGames() {
     if (!udpListenSocket) {
         udpListenSocket = new QUdpSocket(this);
-        // 45454 포트로 들어오는 브로드캐스트를 듣기 위해 바인딩
         udpListenSocket->bind(QHostAddress::AnyIPv4, 45454, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
         connect(udpListenSocket, &QUdpSocket::readyRead, this, &NetworkManager::processPendingDatagrams);
     }
@@ -80,8 +77,11 @@ void NetworkManager::stopListeningForGames() {
     if (udpListenSocket) { udpListenSocket->deleteLater(); udpListenSocket = nullptr; }
 }
 
+// =========================================================================
+// [수정] processPendingDatagrams: 닉네임까지 추출해서 4개의 인자를 emit 합니다.
+// =========================================================================
 void NetworkManager::processPendingDatagrams() {
-    while (udpListenSocket->hasPendingDatagrams()) {
+    while (udpListenSocket && udpListenSocket->hasPendingDatagrams()) {
         QByteArray datagram;
         datagram.resize(udpListenSocket->pendingDatagramSize());
         QHostAddress sender;
@@ -92,17 +92,17 @@ void NetworkManager::processPendingDatagrams() {
         QString data = QString::fromUtf8(datagram);
         QStringList parts = data.split("|");
 
-        // 올바른 체스 게임 브로드캐스트인지 확인
-        if (parts.size() == 3 && parts[0] == "CHESS_LAN") {
+        // 닉네임이 포함되었으므로 조각이 4개 이상이어야 합니다.
+        if (parts.size() >= 4 && parts[0] == "CHESS_LAN") {
             QString roomName = parts[1];
             int tcpPort = parts[2].toInt();
+            QString hostName = parts[3]; // 닉네임 조각 추출
 
-            // IPv4 주소 깔끔하게 파싱 (::ffff:192.168.x.x 형태 방지)
             QString ip = sender.toString();
             if (ip.startsWith("::ffff:")) ip = ip.mid(7);
 
-            // UI쪽에 방을 찾았다고 알림
-            emit gameDiscovered(ip, tcpPort, roomName);
+            // [에러 해결!] 이제 4개의 인자(ip, port, roomName, hostName)를 모두 보냅니다.
+            emit gameDiscovered(ip, tcpPort, roomName, hostName);
         }
     }
 }

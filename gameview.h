@@ -39,7 +39,7 @@ public slots:
     void setLoggedInUser(QString id) { loggedInUserId = id; } // 아이디 설정 함수
     void showHostGameSettings(); // 방 생성 설정 화면 띄우기
     void confirmHostGame();      // 설정 완료 후 호스팅 시작
-    void onGameDiscovered(QString ip, int port, QString roomName);
+    void onGameDiscovered(QString ip, int port, QString roomName, QString hostName);
 
 private:
     NetworkManager *networkManager;

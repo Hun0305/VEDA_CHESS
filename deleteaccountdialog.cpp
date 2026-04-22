@@ -5,7 +5,7 @@
 
 DeleteAccountDialog::DeleteAccountDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle("회원 탈퇴");
-    setFixedSize(300, 300); // 비밀번호 창보다 입력칸이 적어 높이를 줄였습니다.
+    setFixedSize(380, 380); // 비밀번호 창보다 입력칸이 적어 높이를 줄였습니다.
 
     if (parent) this->setStyleSheet(parent->styleSheet());
 
