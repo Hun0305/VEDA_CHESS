@@ -198,34 +198,21 @@ void GameView::hostGame() {
 }
 
 void GameView::startGame() {
-    gameStarted = false; // 이벤트 차단
+    gameStarted = false;
 
     if (scene) {
-        // 아이템들을 완전히 제거
         scene->clear();
     }
 
-    // [수정] 기존 방식 대신 '포인터'로 관리하거나 새로 초기화하는 로직 확인
-    // 현재 boardViewModel이 멤버 변수(객체)이므로,
-    // 내부 데이터(blackPawns, whitePawns 등)가 이전 판의 정보를 들고 있어 충돌날 수 있습니다.
-    // 가장 확실한 방법은 startGame 시점에 필요한 객체들을 순서대로 생성하는 것입니다.
-
-    // 1. 보드 뷰 먼저 생성 (메모리 할당)
-    if (board) {
-        // 기존 보드가 있다면 메모리 해제는 scene->clear()에서 어느정도 처리되지만,
-        // 포인터 자체를 안전하게 관리해야 합니다.
-    }
-
-    // 2. UI 요소들을 그리기 전에 모델 데이터가 준비되어야 함
-    // BoardViewModel의 생성자가 initializePawns()를 호출하는지 확인하세요.
+    // BoardViewModel 초기화 (내부 포인터들이 null로 잘 초기화되는지 확인 필요)
     boardViewModel = BoardViewModel();
 
-    // 3. UI 그리기 함수 호출
+    // UI 객체 생성 순서: Board -> Panel -> User
     drawBoard();
     drawSettingsPanel();
     drawUserPanel();
 
-    // 닉네임 재표시
+    // 닉네임 표시 (중복 생성 방지를 위해 drawUserPanel 이후에 배치)
     if (!loggedInUserId.isEmpty()) {
         QGraphicsTextItem *userDisplay = Utils::createTextItem("닉네임 : " + loggedInUserId, 16, QColor("#FFD700"));
         userDisplay->setPos(this->width() - userDisplay->boundingRect().width() - 20, 20);

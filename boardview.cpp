@@ -9,7 +9,6 @@
 #include "utils.h"
 #include "boardview.h"
 
-extern GameView *game;
 
 int BoardView::numberOfRowsColumns = 8;
 int BoardView::startXPosition = 100;
@@ -69,11 +68,18 @@ void BoardView::placeActivePawnAtBoardPosition(BasePawnModel *pawn, BoardPositio
 void BoardView::removePawnAtBoardPosition(BoardPosition boardPosition) {
     PawnField *pawnField = getPawnAtBoardPosition(boardPosition);
 
-    game->scene->removeItem(pawnField);
+    if (pawnField) {
+        // [수정] game->scene 대신 현재 보드가 속한 scene에서 제거
+        if (this->scene()) {
+            this->scene()->removeItem(pawnField);
+        }
 
-    int index = pawns.indexOf(pawnField);
-    pawns.removeAt(index);
-    delete pawnField;
+        int index = pawns.indexOf(pawnField);
+        if (index != -1) {
+            pawns.removeAt(index);
+            delete pawnField;
+        }
+    }
 }
 
 void BoardView::setPawnMoveCheckWarning(bool visible) {
