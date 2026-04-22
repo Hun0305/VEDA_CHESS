@@ -196,13 +196,6 @@ void GameView::displayRoomList() {
     });
     scene->addItem(rankingBtn);
 
-    // 4. 뒤로가기 버튼
-    ActionButton *hostButton = new ActionButton("Host Game");
-    // 위치를 "Back to Menu" 버튼 옆으로 잡습니다.
-    hostButton->setPos(this->width()/2 - hostButton->boundingRect().width() - 20, 650);
-    connect(hostButton, SIGNAL(buttonPressed()), this, SLOT(hostGame()));
-    scene->addItem(hostButton);
-    */
 
     // [수정] 단일 Host Game 버튼 생성
     ActionButton *hostButton = new ActionButton("Host Game");
@@ -698,6 +691,7 @@ void GameView::updateDatabaseResult(bool isWinner) {
     if (!success) {
         qDebug() << "DB 업데이트 최종 실패:" << query.lastError().text();
     }
+}
 void GameView::showHostGameSettings() {
     scene->clear();
     drawTitle(100, 40);
